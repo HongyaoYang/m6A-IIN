@@ -1,6 +1,6 @@
 # m6A-IIN: Quantitative Cross-Technology Evaluation
 
-Research adaptation of the m6A-IIN architecture for predicting site-level m6A modification proportions and assessing cross-technology generalisation. This private repository contains analysis code, HPC job templates, the recorded aggregate evaluation, and a reproducible plotting script.
+Research adaptation of the m6A-IIN architecture for predicting site-level m6A modification proportions and assessing cross-technology generalisation. This repository contains analysis code, HPC job templates, trained checkpoints, the recorded aggregate evaluation, and a reproducible plotting script.
 
 > **Protocol distinction:** the original paper focuses on binary classification. This project adapts the architecture to quantitative regression with a binomial objective; results should not be described as a direct reproduction of the paper's classification benchmark. See [architecture audit](docs/AUTHOR_FIDELITY_AUDIT.md).
 
@@ -83,11 +83,12 @@ The full aggregate table includes per-pair sample counts and all five metrics: [
 - `jobs/`: HPC Slurm templates, with environment- and cluster-specific paths.
 - `author_original/`: included author-source snapshot used for comparison; review its upstream licensing and provenance before redistribution.
 - `docs/`: protocol and architecture audit notes.
-- `results/`, `figures/`: recorded aggregate metrics and visualisation; individual predictions and checkpoints are excluded.
+- `results/`, `figures/`: recorded aggregate metrics and visualisation; individual predictions are excluded.
+- `checkpoints/`: 11 best model checkpoints from the `final_author_elmo` HPC experiment, one per source technology.
 
 ## Requirements and reproducibility
 
-The workflow requires Python, PyTorch and scientific Python packages, RNAfold, and compatible pretrained ELMo resources. The sequence FASTA, fixed splits, technology ground-truth files, feature caches, and model checkpoints are not included. HPC paths and environments in scripts need adaptation; versions are not pinned. Run the provided small checks and inspect the data contract before launching full preprocessing or training. No complete independent rerun is claimed here.
+The workflow requires Python, PyTorch and scientific Python packages, RNAfold, and compatible pretrained ELMo resources. The sequence FASTA, fixed splits, technology ground-truth files, and feature caches are not included. HPC paths and environments in scripts need adaptation; versions are not pinned. Run the provided small checks and inspect the data contract before launching full preprocessing or training. No complete independent rerun is claimed here. Load checkpoints only from trusted sources; they use PyTorch serialization.
 
 The repository combines the local September 2026 snapshot with selected later HPC updates to the common/model code and additional diagnostic/training scripts. Confirm versions against the relevant HPC job configuration before interpreting or rerunning a specific experiment.
 
