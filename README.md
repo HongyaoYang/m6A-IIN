@@ -6,6 +6,20 @@ Research adaptation of the m6A-IIN architecture for predicting site-level m6A mo
 
 ## Workflow
 
+```mermaid
+flowchart LR
+    A["41-nt sequences and site counts"] --> B["Fixed train / validation IDs"]
+    A --> C["RNAfold structure and loop graphs"]
+    A --> D["Precomputed ELMo features"]
+    B --> E["Train one model per technology"]
+    C --> E
+    D --> E
+    E --> F["Select checkpoint by validation binomial NLL"]
+    F --> G["Predict eligible sites"]
+    G --> H["Join target labels; filter Total ≥ 10"]
+    H --> I["Same-technology holdout and cross-technology metrics"]
+```
+
 1. Prepare 41-nt sequence windows and matching site-level counts and fixed train/validation IDs.
 2. Precompute RNA secondary-structure inputs and author-style ELMo features.
 3. Train one model per technology using valid sites with `Total > 0`; select checkpoints by validation binomial negative log-likelihood.
@@ -18,6 +32,37 @@ The detailed input contracts, commands and important caveats are described in [t
 ## Model and objective
 
 The implementation combines sequence-derived representations, pretrained ELMo features and structure/graph components from the audited author architecture. A scalar output is transformed by sigmoid into a predicted modification proportion. Training uses a binomial negative log-likelihood from modified and total read counts. This objective and the fixed-split evaluation differ from the original paper's classification setting.
+
+```mermaid
+flowchart TD
+    S["41-nt sequence"] --> P["15-D nucleotide representation"]
+    S --> E["Precomputed ELMo features · 256-D"]
+    S --> R["RNAfold secondary structure"]
+    R --> A["Secondary-structure adjacency"]
+    R --> L["Loop adjacency"]
+    P --> G["Graph interaction / coupling"]
+    A --> G
+    L --> G
+    G -->|"Coupled 15-D representation"| C["Concatenate features · 271-D"]
+    E --> C
+    C --> N["Semantic network: CNN + two LSTMs"]
+    G -->|"Coupled graph"| W["Graph wavelet basis"]
+    N --> GW["Graph wavelet neural network"]
+    W --> GW
+    GW --> SC["Scaling and feature aggregation"]
+    SC --> O["Scalar logit → sigmoid → predicted proportion"]
+    G -.-> INV["Reverse coupling / reconstruction outputs"]
+    SC -.-> INV
+    O --> LOSS["Binomial NLL using modified and total counts"]
+```
+
+| Component | Role in this implementation |
+|---|---|
+| Loop learning (LRP) | Transforms loop adjacency into features coupled with the nucleotide representation. |
+| Cross-structure perception (NCM) | Computes an attention-like interaction from the coupled representation and updates the graph. |
+| Semantic network | Processes the 15-D structural representation combined with 256-D ELMo features using convolutions and two separately applied unidirectional LSTMs. |
+| Graph wavelet network | Combines semantic features with a wavelet basis derived from the coupled graph. |
+| Scaling and reverse coupling | Produces scaling and reconstruction outputs; the documented regression objective uses binomial NLL only. |
 
 ## Recorded HPC results
 
