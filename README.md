@@ -95,3 +95,7 @@ The repository combines the local September 2026 snapshot with selected later HP
 ## Reference
 
 Original model: [ZLSRW/m6A-IIN](https://github.com/ZLSRW/m6A-IIN), *Communications Biology* 8, 1022 (2025). This repository is an adaptation and is not the original authors' release.
+
+## Licence
+
+The [MIT licence](LICENSE) applies only to original contributions owned by Hongyao Yang. It does not grant rights to third-party source code, pretrained resources, datasets, or other material owned by others. The upstream m6A-IIN repository did not display a licence when checked; obtain the relevant rights before redistributing its code or derivative material.
